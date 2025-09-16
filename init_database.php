@@ -4,39 +4,36 @@ require 'db_connect.php';
 // Create tables
 $pdo->exec("
 CREATE TABLE IF NOT EXISTS users (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
-    role VARCHAR(20) DEFAULT 'customer'
-);
-");
+    role ENUM('customer', 'admin') DEFAULT 'customer'
+)");
 
 $pdo->exec("
 CREATE TABLE IF NOT EXISTS cars (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id INT AUTO_INCREMENT PRIMARY KEY,
     brand VARCHAR(50) NOT NULL,
     model VARCHAR(50) NOT NULL,
     category VARCHAR(50) NOT NULL,
     priceperday DECIMAL(8,2) NOT NULL,
     description TEXT,
-    available BOOLEAN DEFAULT 1
-);
-");
+    available BOOLEAN DEFAULT TRUE
+)");
 
 $pdo->exec("
 CREATE TABLE IF NOT EXISTS bookings (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    carid INTEGER NOT NULL,
-    userid INTEGER NOT NULL,
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    carid INT NOT NULL,
+    userid INT NOT NULL,
     startdate DATE NOT NULL,
     enddate DATE NOT NULL,
     totalprice DECIMAL(10,2) NOT NULL,
-    status VARCHAR(20) DEFAULT 'pending',
+    status ENUM('pending', 'confirmed', 'cancelled', 'completed') DEFAULT 'pending',
     FOREIGN KEY (carid) REFERENCES cars(id),
     FOREIGN KEY (userid) REFERENCES users(id)
-);
-");
+)");
 
 // Insert sample data only if tables are empty
 $stmt = $pdo->query("SELECT COUNT(*) FROM cars");
@@ -45,7 +42,7 @@ if ($stmt->fetchColumn() == 0) {
     INSERT INTO cars (brand, model, category, priceperday, description) VALUES
     ('Toyota', 'Corolla', 'Compact', 25.00, 'Οικονομικό αυτοκίνητο για καθημερινή χρήση'),
     ('BMW', 'X3', 'SUV', 65.00, 'Πολυτελές SUV για άνετα ταξίδια'),
-    ('Mercedes', 'C-Class', 'Luxury', 85.00, 'Κομψό sedan για επαγγελματικές συναντήσεις');
+    ('Mercedes', 'C-Class', 'Luxury', 85.00, 'Κομψό sedan για επαγγελματικές συναντήσεις')
     ");
 }
 
@@ -57,5 +54,5 @@ if ($stmt->fetchColumn() == 0) {
     $stmt->execute(['Administrator', 'admin@carrental.com', $hashedPassword, 'admin']);
 }
 
-echo "Database initialized successfully!\n";
+echo "MySQL database initialized successfully!\n";
 ?>
